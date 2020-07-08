@@ -18,24 +18,24 @@ typedef struct neighbourhoodType {
 neighbourhoodADT newNeighbourhoods();
 
 //Agrega los nombres de barrios y la cantidad de habitantes de los barrios y los inserta alfabeticamente segun el nombre del barrio.
-void addNeighbourhood(neighbourhoodADT neighbourhoods, neighbourhoodType neighbourhood);
+void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType neighbourhood);
 
 //Agrega un arbol en el barrio que corresponde
-void addTree(neighbourhoodADT neighbourhoods, char* name);
+void addTree(neighbourhoodADT neighbourhoodsData, char* name);
 
 //inicializa el indice 
-void toBegin(neighbourhoodADT neighbourhoods);
+void toBegin(neighbourhoodADT neighbourhoodsData);
 
 //devuelve  1 si hay un siguiente y 0 si no
-int hasNext(neighbourhoodADT neighbourhoods);
+int hasNext(neighbourhoodADT neighbourhoodsData);
 
 
 //retorna un puntero a una copia del neighbourhoodType siguiente 
-neighbourhoodType * next(neighbourhoodADT neighbourhoods);
+neighbourhoodType * next(neighbourhoodADT neighbourhoodsData);
 
 
 //libera la memoria.
-void freeNeighbourhood(neighbourhoodADT neighbourhoods);
+void freeNeighbourhood(neighbourhoodADT neighbourhoodsData);
 
 
 

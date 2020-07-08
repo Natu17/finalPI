@@ -5,43 +5,67 @@
 typedef struct neighbourhoodCDT {
 	neighbourhoodType* neighbourhoods;
 	int index; // indice donde estoy.
-	int dim; //Cant de elementos del vector
-	int count; //Cant total de barrio
+	int dim; //Cant total de barrio
 } neighbourhoodCDT;
+
 
 //crea un nuevo neighbourhoooADT
 neighbourhoodADT newNeighbourhoods(){
 	newNeighbourhoodADT newNeighbourhoodADT = calloc(1, sizeof(neighbourhoodCDT));
+	if (newNeighbourhoodADT == NULL) {
+			perror("Not enough memory");
+			return NULL;
+		}
 	return newNeighbourhoodADT;
 }
 
 //Agrega nombres de barrios
 void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType neighbourhood){
-	if(errno == ENOMEN){
-		//mensaje de error	
-	}
-	if(neighbourhoods->dim == neighbourhoods->count){
-		newNeighbourhoodADT = realloc(newNeighbourhoodADT, (BLOQUE+neighbourhoods->dim)*sizeof(newNeighbourhoodADT));
-		neighbourhoods->dim += BLOQUE;
+	
+	if(neighbourhoods->dim % BLOQUE == 0){
+		newNeighbourhoodADT = realloc(newNeighbourhoodADT, (neighbourhoods.dim + BLOQUE)*sizeof(newNeighbourhoodADT));
+		if (newNeighbourhoodADT == NULL) {
+			perror("Not enough memory");
+			return NULL;
+		}
 	}
 
-	int i = AlphIndex(neighbourhoods, neighbourhood->name);
-	//falta agregarlo al vector y correr los que estan atras.
+	int index = AlphIndex(neighbourhoods, neighbourhood->name);
+	if(index == -1){
+		perror("ERROR two neighborhoods with the same name");
+		return;
+	}
+	neighbourhoodType aux = neighbourhood 
+	neighbourhood->name= malloc(MAX_LENGHT);
+	if (neighbourhood->name == NULL) {
+			perror("Not enough memory");
+			return;
+		}
+	strcpy(neighbourhood->name,aux->name);
+	aux= neighbourhoodsData->neighbourhoods[index];
+	neighbourhoodsData->neighbourhoods[index]= neighbourhood;
+	for(i=index;i<neighbourhoodsData.dim;i++){
+		neighbourhoodsData->neighbourhoods[neighbourhoodsData.dim] = neighbourhoodsData->neighbourhoods[i];
+		neighbourhoodsData->neighbourhoods[i] = aux;
+		aux = neighbourhoodsData->neighbourhood[neighbourhoodsData->dim];
+	}
+	dim++;
 	
 }
 
 //Indica el indice donde debe estar el elemento para que el vector quede ordenado alfabeticamente por nombre del barrio
-int AlphIndex(neighbourhoodADT neighbourhoods, char * name){
+int AlphIndex(neighbourhoodADT neighbourhoodsData, char * name){
 	int i =-1;
 	int found = 0
 
-	while(i<=neighbourhoods->count && !found){
-		int c = newNeighbourhoods[i]-> name.strcmp(name);
+	while(i<= neighbourhoodsData.dim && !found){
+		int c = strcmp(neighbourhoodsData->neighbourhoods[i]-> name, name);
 		if(c > 0){
 			found = 1;
 		}
 		if(c == 0){
-			//mensaje de error
+			perror("ERROR two neighborhoods with the same name");
+			return -1;
 		}
 		i++;
 	}
@@ -49,27 +73,55 @@ int AlphIndex(neighbourhoodADT neighbourhoods, char * name){
 }
 
 //Agrega un arbol en el barrio que corresponde
-void addTree(neighbourhoodADT neighbourhood, char* name){//busqueda binaria
+void addTree(neighbourhoodADT neighbourhoodsData, char* name){//busqueda binaria
+	int index = recursiveBinarySearch(neighbourhoodsData-> neighbourhoods, neighbourhoodsData.dim, name);
+	neighbourhoodsData->neighbourhoods[index].treeCount ++;
 
+}
+int recursiveIndexSearch(neighbourhoodType * neighbourhoods, int dim, char * name){
+	int aux = strcpy(neighbourhoods[ dim/2]->name, name);
+	if(aux == 0 )
+			return dim/2;
+		
+	if(aux > 0)
+		return recursiveIndexSearch(neighbourhoods, dim/2 -1 , name);
+
+	return recursiveIndexSearch(neighbourhoods+ dim/2, (dim + 1)/2, name);
 }
 
 void toBegin(neighbourhoodADT neighbourhoods){
-	neighbourhoods->index = 0;
+	neighbourhoods.index = 0;
 }
 
-int hasNext(neighbourhoodADT neighbourhoods){
-	if (neighbourhoods->index < neighbourhoods->count)
+int hasNext(neighbourhoodADT neighbourhoodsData){
+	if (neighbourhoods.index < neighbourhoods->count)
 		return 0;
 	return 1;
+}
+neighbourhoodType * next(neighbourhoodADT neighbourhoodsData){
+	if(!hasNext(neighbourhoodsData)){
+		perror("The element not exist");
+			return NULL;
+	}
+
+	neighbourhoodType next = neighbourhoodsData->neighbourhoods[neighbourhoodsData.index];
+	next->name = malloc(MAX_LENGHT);
+	if (next->name == NULL) {
+			perror("Not enough memory");
+			return NULL;
+		}
+	strcpy(next->name, neighbourhoodsData->neighbourhoods[neighbourhoodsData.index]->name);
+	neighbourhoodType * nextP = next;
+	return nextP; 
 }
 
 
 void freeNeighbourhood(neighbourhoodADT neighbourhoods){
-	for(i=0;i<neighbourhoods->dim;i++){
-		free(neighbourhoods[i]->name);
-		free(neighbourhoods[i]);
+	for(i=0;i<neighbourhoodsData->dim;i++){
+		free(neighbourhoodsData->neighbourhoods[i]->name);
+		free(neighbourhoodsData->neighbourhoods[i]);
 	}
-	free(neighbourhoods);
+	free(neighbourhoodsData);
 
 }
 
