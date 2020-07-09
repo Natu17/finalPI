@@ -53,7 +53,7 @@ void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType nei
 	
 }
 
-//Indica el indice donde debe estar el elemento para que el vector quede ordenado alfabeticamente por nombre del barrio
+//Indica el indice donde debe estar el elemento para que el vector quede ordenado descendentemente por cantiad de arboles y luego alfabeticamente por nombre del barrio
 int AlphIndex(neighbourhoodADT neighbourhoodsData, char * name){
 	int i =-1;
 	int found = 0
@@ -104,15 +104,20 @@ neighbourhoodType * next(neighbourhoodADT neighbourhoodsData){
 			return NULL;
 	}
 
-	neighbourhoodType next = neighbourhoodsData->neighbourhoods[neighbourhoodsData.index];
+	neighbourhoodType * next;
+	next = calloc(1, sizeof(neighbourhoodCDT->neighbourhoods));
+	if (next == NULL) {
+			perror("Not enough memory");
+			return NULL;
+		}
+	*next = neighbourhoodsData->neighbourhoods[neighbourhoodsData.index];
 	next->name = malloc(MAX_LENGHT);
 	if (next->name == NULL) {
 			perror("Not enough memory");
 			return NULL;
 		}
 	strcpy(next->name, neighbourhoodsData->neighbourhoods[neighbourhoodsData.index]->name);
-	neighbourhoodType * nextP = next;
-	return nextP; 
+	return next; 
 }
 
 
@@ -124,4 +129,5 @@ void freeNeighbourhood(neighbourhoodADT neighbourhoods){
 	free(neighbourhoodsData);
 
 }
+
 
