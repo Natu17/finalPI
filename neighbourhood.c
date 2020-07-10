@@ -19,7 +19,7 @@ neighbourhoodADT newNeighbourhoods(){
 	neighbourhoodADT newNeighbourhoodADT = calloc(1, sizeof(neighbourhoodCDT));
 	if(errno == ENOMEM){
 		perror("Not enough memory");
-		return;
+		return NULL;
 	}
 	return newNeighbourhoodADT;
 }
@@ -132,13 +132,13 @@ neighbourhoodType * next(neighbourhoodADT neighbourhoodsData){
 	next = calloc(1, sizeof(neighbourhoodType));
 	if(errno == ENOMEM){
 		perror("Not enough memory");
-		return;
+		return NULL;
 	}
 	*next = neighbourhoodsData->neighbourhoods[neighbourhoodsData->index];
 	next->name = malloc(strlen(neighbourhoodsData->neighbourhoods[neighbourhoodsData->index].name) + 1); //Es mejor con el Max Lenght?
 	if(errno == ENOMEM){
 		perror("Not enough memory");
-		return;
+		return NULL;
 	}
 	strcpy(next->name, neighbourhoodsData->neighbourhoods[neighbourhoodsData->index].name);
 	return next; 
