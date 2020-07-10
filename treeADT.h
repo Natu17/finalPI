@@ -2,8 +2,7 @@
 #define treeADT_h
 #include <stdio.h>
 
-typedef struct treeCDT;
-typedef treeCDT* treeADT;
+typedef struct treeCDT* treeADT;
 
 typedef struct treeType {
 	float diameter;
