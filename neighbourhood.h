@@ -2,11 +2,7 @@
 #define neighbourhood_h
 #include <stdio.h>
 
-
-
-typedef struct neighbourhoodCDT;
-typedef neighbourhoodCDT* neighbourhoodADT;
-
+typedef struct neighbourhoodCDT* neighbourhoodADT;
 
 typedef struct neighbourhoodType {
 	char* name;
