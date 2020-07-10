@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <errno.h>
 #include "treeADT.h"
 
 typedef struct node {
-	size_t cout;
+	size_t count;
 	treeType tree;
 	struct node* tail;
 } node;
@@ -20,27 +21,28 @@ treeADT newTree() {
 	return calloc(1, sizeof(treeCDT));
 }
 
-static PNode addTreeRec(PNode first, char * name, float diameter) {
+static PNode addTreeRec(PNode first, char * name, double diameter) {
 	int c;
-	if(first == NULL || c = (strcmp(name, first->tree->name)) < 0){
+	errno = 0;
+	if(first == NULL || (c = strcmp(name, first->tree.name)) < 0){
 		PNode aux = malloc(sizeof(node));
-		if(errno == ENOMEN) { //Falta ver como chequear esto
-
-			return ;
+		if(errno == ENOMEM) { 
+			perror("Not enough memory");
+			return first;
 		}
-		aux->tree->name = malloc(strlen(name) + 1);
-		if(errno == ENOMEN) {
-
-			return ;
+		aux->tree.name = malloc(strlen(name) + 1);
+		if(errno == ENOMEM) {
+			perror("Not enough memory");
+			return first;
 		}
-		strcpy(aux->tree->name, name);
+		strcpy(aux->tree.name, name);
 		aux->tree.diameter = diameter;
 		aux->count = 1;
 		aux->tail = first;
 		return aux;
 	}
 	if(c == 0) {
-		first->tree.diameter = ((first->tree.diameter * first->count) + diameter) / first->count;
+		first->tree.diameter = ((first->tree.diameter * first->count) + diameter) / (first->count + 1);
 		first->count++;
 		return first;
 	}
@@ -48,29 +50,46 @@ static PNode addTreeRec(PNode first, char * name, float diameter) {
 	return first;
 }
 
-void addTree(treeADT tree, char* name, float diameter){
+void addTree(treeADT tree, char* name, double diameter){
 	tree->first = addTreeRec(tree->first, name, diameter);
 }
 
 
-void toBegin(treeADT tree) {
+void toBeginTree(treeADT tree) {
 	tree->current = tree->first;
 }
 
-int hasNext(treeADT tree) {
-	return list->current != NULL;
+int hasNextTree(treeADT tree) {
+	return tree->current != NULL;
 }
 
-treeType next(treeADT tree) {
-	if(!hasNext)
-		Error("There are no more elements");
-	treeType ans = tree->current->tree;
+treeType * nextTree(treeADT tree) {
+	errno = 0;
+	if(!hasNext(tree)) {
+		perror("There are no more elements");
+		return NULL;
+	}
+	treeType * ans = malloc(sizeof(treeType));
+	if(errno == ENOMEM) {
+		perror("Not enough memory");
+		return first;
+	}
+	ans->diameter = tree->current->tree.diameter;
+	ans->name = malloc(strlen(tree->current->tree.name) + 1);
+	if(errno == ENOMEM) {
+		perror("Not enough memory");
+		return first;
+	}
+	strcpy(ans->name, tree->current->tree.name);
 	tree->current = tree->current->tail;
+	return ans;
 }
 
-static void freeTreeRec(PNode first) { //Ver como liberar los treeType
-	if(first != NULL)
+static void freeTreeRec(PNode first) { 
+	if(first != NULL){
+		free(first->tree.name);
 		freeTreeRec(first->tail);
+	}
 	free(first);
 }
 
@@ -78,3 +97,4 @@ void freeTree(treeADT tree) {
 	freeTreeRec(tree->first);
 	free(tree);
 }
+
