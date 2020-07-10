@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include<string.h>
+#include <string.h>
 #include "neighbourhood.h"
 #define BLOQUE  5
 #define MAX_LENGHT 25
@@ -15,7 +15,12 @@ typedef struct neighbourhoodCDT {
 
 //crea un nuevo neighbourhoooADT
 neighbourhoodADT newNeighbourhoods(){
+	errno=0;
 	neighbourhoodADT newNeighbourhoodADT = calloc(1, sizeof(neighbourhoodCDT));
+	if(errno == ENOMEM){
+		perror("Not enough memory");
+		return;
+	}
 	return newNeighbourhoodADT;
 }
 
@@ -42,28 +47,31 @@ int AlphIndex(neighbourhoodADT neighbourhoodsData, char * name){
 
 //Agrega nombres de barrios
 void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType neighbourhood){
-		
+		errno = 0;
 		if(neighbourhoodsData->dim % BLOQUE == 0){
 			neighbourhoodsData->neighbourhoods = realloc(neighbourhoodsData->neighbourhoods, (neighbourhoodsData->dim + BLOQUE)*sizeof(neighbourhoodType));
-			if (neighbourhoodsData->neighbourhoods == NULL) {
+			if(errno == ENOMEM){
 				perror("Not enough memory");
 				return;
-			}
+	}
 		}
 
 	int index = AlphIndex(neighbourhoodsData, neighbourhood.name);
-	printf("%s\n", "SALIII!!!!!!!!!!!!!!!!!");
 	if(index == -1){
 		perror("ERROR two neighbourhoods with the same name");
 		return;
 	}
 	neighbourhoodType * aux = malloc(sizeof(neighbourhoodType));
+	if(errno == ENOMEM){
+		perror("Not enough memory");
+		return;
+	}
 	*aux = neighbourhood; 
-	neighbourhood.name= malloc(MAX_LENGHT);
-	if (neighbourhood.name == NULL) {
-			perror("Not enough memory");
-			return;
-		}
+	neighbourhood.name= malloc(strlen(aux->name));
+	if(errno == ENOMEM){
+		perror("Not enough memory");
+		return;
+	}
 	strcpy(neighbourhood.name,aux->name);
 	*aux= neighbourhoodsData->neighbourhoods[index];
 	neighbourhoodsData->neighbourhoods[index]= neighbourhood;
@@ -74,20 +82,17 @@ void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType nei
 	}
 	free(aux);
 	neighbourhoodsData->dim++;
-	printf("%s\n", "lo agrego");
 	
 }
 
+//se fija con una busqueda binaria recursiva si el barrio esta en el vector y retorna el indice si esta, y -1 si no esta
 int recursiveIndexSearch(neighbourhoodType * neighbourhoods, int dim, char * name){
-	printf("%d\n", dim);
 	if(dim == -1 ){
-		printf("%s\n", name);
 		return -1;
 	}
 	int aux = strcmp(neighbourhoods[dim/2].name, name);
 	if(dim == 1 && aux != 0)
 		return -1;
-
 	
 	if(aux == 0 )
 			return dim/2;
@@ -99,7 +104,7 @@ int recursiveIndexSearch(neighbourhoodType * neighbourhoods, int dim, char * nam
 }
 
 //Agrega un arbol en el barrio que corresponde
-void addTree(neighbourhoodADT neighbourhoodsData, char* name){//busqueda binaria
+void addOneTree(neighbourhoodADT neighbourhoodsData, char* name){
 	int index = recursiveIndexSearch(neighbourhoodsData-> neighbourhoods, neighbourhoodsData->dim, name);
 	if(index == -1){
 		perror("Not such neighbourhood");
@@ -107,37 +112,34 @@ void addTree(neighbourhoodADT neighbourhoodsData, char* name){//busqueda binaria
 	}
 	neighbourhoodsData->neighbourhoods[index].treeCount ++;
 
-
 }
-
 
 void toBegin(neighbourhoodADT neighbourhoodsData){
 	neighbourhoodsData->index = 0;
 }
 
 int hasNext(neighbourhoodADT neighbourhoodsData){
-	if (neighbourhoodsData->index < neighbourhoodsData->dim)
-		return 1;
-	return 0;
+	return neighbourhoodsData->index < neighbourhoodsData->dim
 }
 neighbourhoodType * next(neighbourhoodADT neighbourhoodsData){
 	if(!hasNext(neighbourhoodsData)){
 		perror("The element not exist");
 			return NULL;
 	}
+	errno = 0;
 
 	neighbourhoodType *next;
 	next = calloc(1, sizeof(neighbourhoodType));
-	if (next == NULL) {
-			perror("Not enough memory");
-			return NULL;
-		}
+	if(errno == ENOMEM){
+		perror("Not enough memory");
+		return;
+	}
 	*next = neighbourhoodsData->neighbourhoods[neighbourhoodsData->index];
-	next->name = malloc(MAX_LENGHT);
-	if (next->name == NULL) {
-			perror("Not enough memory");
-			return NULL;
-		}
+	next->name = malloc(strlen(neighbourhoodsData->neighbourhoods[neighbourhoodsData->index].name) + 1); //Es mejor con el Max Lenght?
+	if(errno == ENOMEM){
+		perror("Not enough memory");
+		return;
+	}
 	strcpy(next->name, neighbourhoodsData->neighbourhoods[neighbourhoodsData->index].name);
 	return next; 
 }
@@ -145,7 +147,6 @@ neighbourhoodType * next(neighbourhoodADT neighbourhoodsData){
 
 void freeNeighbourhood(neighbourhoodADT neighbourhoodsData){
 	//neighbourhoodsData->neighbourhoods = realloc(neighbourhoodsData->neighbourhoods, (neighbourhoodsData->dim)*sizeof(neighbourhoodType));
-	//printf("%s\n", "hi");
 	for(int i=0;i<neighbourhoodsData->dim;i++){
 		free(neighbourhoodsData->neighbourhoods[i].name);
 	}
@@ -154,7 +155,7 @@ void freeNeighbourhood(neighbourhoodADT neighbourhoodsData){
 
 }
 
-int main(int argc, char *argv[]){
+/*int main(int argc, char *argv[]){ //funciono.
 	neighbourhoodADT nADT = newNeighbourhoods();
 	neighbourhoodType ne = {"h", 12, 123456};
 	neighbourhoodType tyu = {"hola", 16, 123456};
@@ -168,6 +169,6 @@ int main(int argc, char *argv[]){
 	free(new);
 	freeNeighbourhood(nADT);
 	
-}
+}*/
 
 
