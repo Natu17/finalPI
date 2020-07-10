@@ -17,11 +17,11 @@ treeADT newTree();
 void addTree(treeADT tree, char* name, float diameter);
 
 
-void toBegin(treeADT tree);
+void toBeginTree(treeADT tree);
 
-int hasNext(treeADT tree);
+int hasNextTree(treeADT tree);
 
-treeType next(treeADT tree);
+treeType nextTree(treeADT tree);
 
 void freeTree(treeADT tree);
 
