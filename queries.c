@@ -113,7 +113,7 @@ void query1(neighbourhoodADT neighbourhood){
 		neighbourhoodType * aux = next(neighbourhood);
 		add(listQ1, aux->name, aux->treeCount);
 		float value =(float) aux->treeCount/aux->population;
-		add(listQ2, aux->name, value);
+		add(listQ2, aux->name, ((int)(100 * value)) / 100.0);
 		free(aux->name);
 		free(aux);	
 	}
@@ -129,6 +129,7 @@ void query1(neighbourhoodADT neighbourhood){
 	while(hasNextList(listQ2)) {
 		elemType * elem = nextList(listQ2);
 		fprintf(file2, "%s;%.2f\n", elem->name, elem->number);
+		// fprintf(file2, "%s;%.2f\n", elem->name, ((int)(100 * elem->number)) / 100.0);
 		free(elem->name);
 		free(elem);	
 	}
@@ -143,7 +144,7 @@ void query3(treeADT tree){
 	toBeginTree(tree);
 	while(hasNextTree(tree)) {
 		treeType * treeAux = nextTree(tree);
-		add(listQ3, treeAux->name, treeAux->diameter);	
+		add(listQ3, treeAux->name, ((int)(100 * treeAux->diameter)) / 100.0);	
 		free(treeAux->name);
 		free(treeAux);
 	}
@@ -159,35 +160,3 @@ void query3(treeADT tree){
 }
 
 
-int main(int argc, char const *argv[])
-{
-	neighbourhoodADT nADT = newNeighbourhoods();
-	treeADT tADT = newTree();
-	neighbourhoodType h = {"h", 12000, 12};
-	neighbourhoodType c = {"c", 167, 167};
-	neighbourhoodType a = {"a", 120, 12};
-	neighbourhoodType d = {"d", 1600, 1256};
-	neighbourhoodType bu = {"bu", 1200, 123456};
-	neighbourhoodType uy = {"uy", 160000, 123456};
-	addNeighbourhood(nADT,h);
-	addNeighbourhood(nADT,c);
-	addNeighbourhood(nADT,a);
-	addNeighbourhood(nADT,d);
-	addNeighbourhood(nADT,bu);
-	addNeighbourhood(nADT,uy);
-	addTree(tADT,"arbol2", 123456);
-	addTree(tADT,"AAA", 123456);
-	addTree(tADT,"BUUU", 12);
-	addTree(tADT,"DAAA", 12);
-	addTree(tADT,"LEE", 123456577);
-	addOneTree(nADT, "h");
-	addOneTree(nADT, "c");
-	addOneTree(nADT, "a");
-	addOneTree(nADT, "bu");
-	query1(nADT);
-	query3(tADT);
-	freeNeighbourhood(nADT);
-	freeTree(tADT);
-	return 0;
-
-}
