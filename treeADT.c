@@ -18,10 +18,16 @@ typedef struct treeCDT {
 } treeCDT;
 
 treeADT newTree() {
-	return calloc(1, sizeof(treeCDT));
+	errno = 0;
+	treeADT tree = calloc(1, sizeof(treeCDT));
+	if(errno == ENOMEM){
+		perror("Not enough memory");
+		return NULL;
+	}
+	return tree;
 }
 
-static PNode addTreeRec(PNode first, char * name, double diameter) {
+static PNode addTreeRec(PNode first, char * name, float diameter) {
 	int c;
 	errno = 0;
 	if(first == NULL || (c = strcmp(name, first->tree.name)) < 0){
@@ -50,7 +56,7 @@ static PNode addTreeRec(PNode first, char * name, double diameter) {
 	return first;
 }
 
-void addTree(treeADT tree, char* name, double diameter){
+void addTree(treeADT tree, char* name, float diameter){
 	tree->first = addTreeRec(tree->first, name, diameter);
 }
 
@@ -65,20 +71,20 @@ int hasNextTree(treeADT tree) {
 
 treeType * nextTree(treeADT tree) {
 	errno = 0;
-	if(!hasNext(tree)) {
+	if(!hasNextTree(tree)) {
 		perror("There are no more elements");
 		return NULL;
 	}
 	treeType * ans = malloc(sizeof(treeType));
 	if(errno == ENOMEM) {
 		perror("Not enough memory");
-		return first;
+		return NULL;
 	}
 	ans->diameter = tree->current->tree.diameter;
 	ans->name = malloc(strlen(tree->current->tree.name) + 1);
 	if(errno == ENOMEM) {
 		perror("Not enough memory");
-		return first;
+		return NULL;
 	}
 	strcpy(ans->name, tree->current->tree.name);
 	tree->current = tree->current->tail;
