@@ -24,17 +24,6 @@ neighbourhoodADT newNeighbourhoods(){
 	return newNeighbourhoodADT;
 }
 
-//Indica el indice donde debe estar el elemento para que el vector quede ordenado descendentemente por cantiad de arboles y luego alfabeticamente por nombre del barrio
-/*int AlphIndex(neighbourhoodADT neighbourhoodsData, char * name){
-	int i =0;
-	
-	while(i<neighbourhoodsData->dim && !found){
-		
-		i++;
-	}
-	return i;
-}
-*/
 void insertNeighbourhood(neighbourhoodType* neighbourhoods, neighbourhoodType neighbourhood, int dim){
 	for(int i = 0; i < dim; i++){
 		int c = strcmp(neighbourhoods[i].name,neighbourhood.name);
@@ -91,7 +80,7 @@ void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType nei
 }
 
 //se fija con una busqueda binaria recursiva si el barrio esta en el vector y retorna el indice si esta, y -1 si no esta
-int recursiveIndexSearch(neighbourhoodType * neighbourhoods, int dim, char * name){
+int recursiveSearchAddTree(neighbourhoodType * neighbourhoods, int dim, char * name){
 	if(dim == -1 )
 		return -1;
 	
@@ -99,24 +88,22 @@ int recursiveIndexSearch(neighbourhoodType * neighbourhoods, int dim, char * nam
 	if(dim == 1 && aux != 0)
 		return -1;
 	
-	if(aux == 0 )
-			return dim/2;
-		
+	if(aux == 0 ){
+		 neighbourhoods[dim/2].treeCount++;
+		 return 1;
+	}
 	if(aux > 0)
-		return recursiveIndexSearch(neighbourhoods, dim/2 , name);
+		return recursiveSearchAddTree(neighbourhoods, dim/2 , name);
 
-	return recursiveIndexSearch(neighbourhoods + dim/2+1, dim-dim/2-1, name);
+	return recursiveSearchAddTree(neighbourhoods + dim/2+1, dim-dim/2-1, name);
 }
 
 //Agrega un arbol en el barrio que corresponde
 void addOneTree(neighbourhoodADT neighbourhoodsData, char* name){
-	int index = recursiveIndexSearch(neighbourhoodsData-> neighbourhoods, neighbourhoodsData->dim, name);
-	if(index == -1){
-		perror("Not such neighbourhood");
-		return;
+	int ans = recursiveSearchAddTree(neighbourhoodsData-> neighbourhoods, neighbourhoodsData->dim, name);
+	if(ans == -1){
+		perror("no such neighbourhood");
 	}
-	neighbourhoodsData->neighbourhoods[index].treeCount ++;
-
 }
 
 void toBegin(neighbourhoodADT neighbourhoodsData){
