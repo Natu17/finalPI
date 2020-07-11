@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <ctype.h>
 #include "neighbourhood.h"
 #include "treeADT.h"
@@ -24,6 +25,14 @@ typedef struct list {
 
 typedef list * PList;
 
+PList newlist() {
+	PList newList = calloc(1, sizeof(list));
+	if(errno == ENOMEM){
+		perror("Not enough memory");
+		return NULL;
+	}
+	return newList;
+}
 PNode addListRec(PNode first, char * name, float number) {
 	errno = 0;
 	if(first == NULL ||   first->elem.number - number < 0){
@@ -93,10 +102,44 @@ void freeList(PList list) {
 	free(list);
 }
 
+
+void query1(neighbourhoodADT neighbourhood){
+	PList listQ1 = newlist();
+	PList listQ2 = newlist();
+	FILE * file1 = fopen ("./query1.csv", "w+");
+	FILE * file2 = fopen ("./query2.csv", "w+");
+	toBegin(neighbourhood);
+	while(hasNext(neighbourhood)) {
+		neighbourhoodType * aux = next(neighbourhood);
+		add(listQ1, aux->name, aux->population);
+		float value =(float) aux->treeCount/aux->population;
+		add(listQ2, aux->name, value);
+		free(aux->name);
+		free(aux);	
+	}
+	toBeginList(listQ1);
+	while(hasNextList(listQ1)) {
+		elemType * elem = nextList(listQ1);
+		fprintf(file1, "%s;%g\n", elem->name, elem->number);
+		free(elem->name);
+		free(elem);	
+	}
+	freeList(listQ1);
+	toBeginList(listQ2);
+	while(hasNextList(listQ2)) {
+		elemType * elem = nextList(listQ2);
+		fprintf(file2, "%s;%.2f\n", elem->name, elem->number);
+		free(elem->name);
+		free(elem);	
+	}
+	freeList(listQ2);
+	fclose(file1);
+	fclose(file2);
+}
+
 void query3(treeADT tree){
-	PList listQ3 = calloc(1, sizeof(list));
-	FILE * file;
-	file = fopen ("./query3.csv", "w+");
+	PList listQ3 = newlist();
+	FILE * file3 = fopen ("./query3.csv", "w+");
 	toBeginTree(tree);
 	while(hasNextTree(tree)) {
 		treeType * treeAux = nextTree(tree);
@@ -107,11 +150,45 @@ void query3(treeADT tree){
 	toBeginList(listQ3);
 	while(hasNextList(listQ3)) {
 		elemType * ans = nextList(listQ3);
-		fprintf(file, "%s;%.2f\n", ans->name, ans->number);
+		fprintf(file3, "%s;%.2f\n", ans->name, ans->number);
 		free(ans->name);
 		free(ans);
 	}
 	freeList(listQ3);
-	fclose(file);
+	fclose(file3);
 }
 
+/*
+int main(int argc, char const *argv[])
+{
+	neighbourhoodADT nADT = newNeighbourhoods();
+	treeADT tADT = newTree();
+	neighbourhoodType h = {"h", 12000, 12};
+	neighbourhoodType c = {"c", 167, 167};
+	neighbourhoodType a = {"a", 120, 12};
+	neighbourhoodType d = {"d", 1600, 1256};
+	neighbourhoodType bu = {"bu", 1200, 123456};
+	neighbourhoodType uy = {"uy", 160000, 123456};
+	addNeighbourhood(nADT, h);
+	addNeighbourhood(nADT,c);
+	addNeighbourhood(nADT, a);
+	addNeighbourhood(nADT,d);
+	addNeighbourhood(nADT, bu);
+	addNeighbourhood(nADT, uy);
+	addTree(tADT,"arbol2", 123456);
+	addTree(tADT,"AAA", 123456);
+	addTree(tADT,"BUUU", 12);
+	addTree(tADT,"DAAA", 12);
+	addTree(tADT,"LEE", 123456577);
+	addOneTree(nADT, "h");
+	addOneTree(nADT, "c");
+	addOneTree(nADT, "a");
+	addOneTree(nADT, "bu");
+	query1(nADT);
+	query3(tADT);
+	freeNeighbourhood(nADT);
+	freeTree(tADT);
+	return 0;
+
+}
+*/
