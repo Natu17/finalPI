@@ -19,6 +19,7 @@ void loadNeighbourhood(neighbourhoodADT neighbourhood, const char* nameNeighbour
 	free(newType.name);
 } 
 
+
 void readNeighbourhood(neighbourhoodADT neighbourhood, FILE* fileNeighbourhood) {
 	char c;
 	char *nameNeighbourhood = NULL;
@@ -26,37 +27,40 @@ void readNeighbourhood(neighbourhoodADT neighbourhood, FILE* fileNeighbourhood) 
 	int firstLine = 1, countString = 0, colNumber = 1;
 	while((c = fgetc(fileNeighbourhood)) != EOF) {
 		if (c == '\n') {
-			if (!firstLine) {
-				population[countString] = '\0';
-				population = realloc(population, (countString + 1) * sizeof(char));
-				loadNeighbourhood(neighbourhood, nameNeighbourhood, population); //Carga los datos de la fila
-				countString = 0;
-				colNumber = 1;
-			}
 			firstLine = 0;
+			continue;
 		}
 		if (firstLine) {
 			continue;
 		}
-		if (c == ';') {
-			colNumber++;
+		if (colNumber == 1) {
+			while (c != ';') {
+				if (countString % BLOQUE == 0) {
+					nameNeighbourhood = realloc(nameNeighbourhood, (countString + 1 + BLOQUE) * sizeof(char));
+				}
+				nameNeighbourhood[countString++] = c;
+				c = fgetc(fileNeighbourhood);
+			}
 			nameNeighbourhood[countString] = '\0';
 			nameNeighbourhood = realloc(nameNeighbourhood, (countString + 1) * sizeof(char));
 			countString = 0;
-			continue;
-		}
-		if (colNumber == 1 && c != '\n') {
-			if (countString % BLOQUE == 0) {
-				nameNeighbourhood = realloc(nameNeighbourhood, (countString + BLOQUE) * sizeof(char));
-			}
-			nameNeighbourhood[countString++] = c;
-
+			colNumber++;
+			c = fgetc(fileNeighbourhood);
 		}
 		if (colNumber == 2) {
-			if (countString % BLOQUE == 0) {
-				population = realloc(population, (countString + BLOQUE) * sizeof(char));
+			while (c != '\n') {
+				if (countString % BLOQUE == 0) {
+					population = realloc(population, (countString + 1 + BLOQUE) * sizeof(char));
+				}
+				population[countString++] = c;
+				c = fgetc(fileNeighbourhood);
 			}
-			population[countString++] = c;
+			population[countString] = '\0';
+			population = realloc(population, (countString + 1) * sizeof(char));
+			countString = 0;
+			colNumber = 1;
+
+			loadNeighbourhood(neighbourhood, nameNeighbourhood, population);
 		}
 	}
 	free(nameNeighbourhood);
@@ -99,20 +103,17 @@ void readTrees(treeADT tree, neighbourhoodADT neighbourhood, FILE* fileTrees) {
 	char *nameNeighbourhood = NULL;
 	char *nameSpecies = NULL;
 	char *diameter = NULL;
-	int count = 1, countString = 0, comma = 1;
+	int count = 1, countString = 0;
 	int* index = readFirstRow(fileTrees);
 	while ((c = fgetc(fileTrees)) != EOF) {
 		if (c == ';') {
 			count++;
-			if ((c = fgetc(fileTrees)) == ';') {
-				count++;
-				c = fgetc(fileTrees);
-			}
+			continue;
 		}
 		if (count == index[0]) {
 			while (c != ';' && c != '\n') {
 				if (countString % BLOQUE == 0) {
-					nameNeighbourhood = realloc(nameNeighbourhood, (countString + BLOQUE) * sizeof(char));
+					nameNeighbourhood = realloc(nameNeighbourhood, (countString + 1 + BLOQUE) * sizeof(char));
 				}
 				nameNeighbourhood[countString++] = c;
 				c = fgetc(fileTrees);
