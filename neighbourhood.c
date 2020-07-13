@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <ctype.h>
 #include "neighbourhood.h"
 #define BLOQUE  5
 #define MAX_LENGHT 25
@@ -9,7 +10,7 @@
 typedef struct neighbourhoodCDT {
 	neighbourhoodType* neighbourhoods;
 	int index; // indice donde estoy.
-	int dim; //Cant total de barrio
+	int dim; //Cant total de barrios.
 } neighbourhoodCDT;
 
 
@@ -23,6 +24,7 @@ neighbourhoodADT newNeighbourhoods(){
 	}
 	return newNeighbourhoodADT;
 }
+
 
 void insertNeighbourhood(neighbourhoodType* neighbourhoods, neighbourhoodType neighbourhood, int dim){
 	for(int i = 0; i < dim; i++){
@@ -70,6 +72,7 @@ void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType nei
 	}
 	strcpy(neighbourhood.name,aux->name);
 	free(aux);
+	neighbourhood.treeCount = 0;
 	if(neighbourhoodsData->dim == 0){
 		neighbourhoodsData->neighbourhoods[neighbourhoodsData->dim] = neighbourhood;
 	}else{
@@ -79,7 +82,7 @@ void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType nei
 	
 }
 
-//se fija con una busqueda binaria recursiva si el barrio esta en el vector y retorna el indice si esta, y -1 si no esta
+//se fija con una busqueda binaria recursiva si el barrio esta en el vector, agrega 1 arbol al contador de arboles y retorna 1 si esta y -1 si no esta
 int recursiveSearchAddTree(neighbourhoodType * neighbourhoods, int dim, char * name){
 	if(dim == -1 )
 		return -1;
@@ -89,7 +92,7 @@ int recursiveSearchAddTree(neighbourhoodType * neighbourhoods, int dim, char * n
 		return -1;
 	
 	if(aux == 0 ){
-		 neighbourhoods[dim/2].treeCount++;
+		 neighbourhoods[dim/2].treeCount = neighbourhoods[dim/2].treeCount  + 1;
 		 return 1;
 	}
 	if(aux > 0)
@@ -127,14 +130,13 @@ neighbourhoodType * next(neighbourhoodADT neighbourhoodsData){
 		return NULL;
 	}
 	*next = neighbourhoodsData->neighbourhoods[neighbourhoodsData->index];
-	next->name = malloc(MAX_LENGHT); //Es mejor con el Max Lenght?
+	next->name = malloc(MAX_LENGHT); 
 	if(errno == ENOMEM){
 		perror("Not enough memory");
 		return NULL;
 	}
 	strcpy(next->name, neighbourhoodsData->neighbourhoods[neighbourhoodsData->index].name);
 	neighbourhoodsData->index ++;
-	//printf("%d\n",neighbourhoodsData->index);
 	return next; 
 }
 
@@ -149,21 +151,3 @@ void freeNeighbourhood(neighbourhoodADT neighbourhoodsData){
 
 }
 
-/*
-int main(int argc, char *argv[]){ //funciono.
-	neighbourhoodADT nADT = newNeighbourhoods();
-	neighbourhoodType ne = {"h", 12, 123456};
-	neighbourhoodType tyu = {"hola", 16, 123456};
-	addNeighbourhood(nADT, ne);
-	addNeighbourhood(nADT,tyu);
-	addOneTree(nADT, "h");
-	addOneTree(nADT, "hola");
-	toBegin(nADT);
-	neighbourhoodType * new = next(nADT);
-	free(new->name);
-	free(new);
-	freeNeighbourhood(nADT);
-	
-}
-
-*/

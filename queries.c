@@ -3,8 +3,10 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <math.h>
 #include "neighbourhood.h"
 #include "treeADT.h"
+
 
 typedef struct elemType {
 	char* name;
@@ -25,6 +27,7 @@ typedef struct list {
 
 typedef list * PList;
 
+//crea una nueva lista
 PList newlist() {
 	PList newList = calloc(1, sizeof(list));
 	if(errno == ENOMEM){
@@ -33,6 +36,8 @@ PList newlist() {
 	}
 	return newList;
 }
+
+//agrega recursivamente y con orden descendiente por "number" 
 PNode addListRec(PNode first, char * name, float number) {
 	errno = 0;
 	if(first == NULL ||   first->elem.number - number < 0){
@@ -55,18 +60,22 @@ PNode addListRec(PNode first, char * name, float number) {
 	return first;
 }
 
+//agrega un nodo a la lista
 void add(PList list, char* name, float number){
 	list->first = addListRec(list->first, name, number);
 }
 
+// iguala el nodo current a first
 void toBeginList(PList list) {
 	list->current = list->first;
 }
 
+//retorna 1 si hay un nodo siguiente 0 si no
 int hasNextList(PList list) {
 	return list->current != NULL;
 }
 
+//retorna el siguiente nodo
 elemType * nextList(PList list) {
 	errno = 0;
 	if(!hasNextList(list)) {
@@ -89,6 +98,7 @@ elemType * nextList(PList list) {
 	return ans;
 }
 
+//free recursivo de los nodos de la lista
 void freeListRec(PNode first) { 
 	if(first != NULL) {
 		free(first->elem.name);
@@ -97,13 +107,14 @@ void freeListRec(PNode first) {
 	free(first);
 }
 
+//free de la lista
 void freeList(PList list) {
 	freeListRec(list->first);
 	free(list);
 }
 
 
-void query1(neighbourhoodADT neighbourhood){
+void query1and2(neighbourhoodADT neighbourhood){
 	PList listQ1 = newlist();
 	PList listQ2 = newlist();
 	FILE * file1 = fopen ("./query1.csv", "w+");
@@ -113,19 +124,21 @@ void query1(neighbourhoodADT neighbourhood){
 		neighbourhoodType * aux = next(neighbourhood);
 		add(listQ1, aux->name, aux->treeCount);
 		float value =(float) aux->treeCount/aux->population;
-		add(listQ2, aux->name, ((int)(100 * value)) / 100.0);
+		add(listQ2, aux->name, ((truncf(100 * value))) / 100.0);
 		free(aux->name);
 		free(aux);	
 	}
 	toBeginList(listQ1);
+	fprintf(file1, "%s;%s\n","BARRIO", "ARBOLES");
 	while(hasNextList(listQ1)) {
 		elemType * elem = nextList(listQ1);
-		fprintf(file1, "%s;%g\n", elem->name, elem->number);
+		fprintf(file1, "%s;%0.f\n", elem->name, elem->number);
 		free(elem->name);
 		free(elem);	
 	}
 	freeList(listQ1);
 	toBeginList(listQ2);
+	fprintf(file2, "%s;%s\n","BARRIO", "ARBOLES_POR_HABITANTE");
 	while(hasNextList(listQ2)) {
 		elemType * elem = nextList(listQ2);
 		fprintf(file2, "%s;%.2f\n", elem->name, elem->number);
@@ -144,11 +157,12 @@ void query3(treeADT tree){
 	toBeginTree(tree);
 	while(hasNextTree(tree)) {
 		treeType * treeAux = nextTree(tree);
-		add(listQ3, treeAux->name, ((int)(100 * treeAux->diameter)) / 100.0);	
+		add(listQ3, treeAux->name, ((truncf(100 * treeAux->diameter))) / 100.0);	
 		free(treeAux->name);
 		free(treeAux);
 	}
 	toBeginList(listQ3);
+	fprintf(file3, "%s;%s\n","NOMBRE_CIENTIFICO", "PROMEDIO_DIAMETRO");
 	while(hasNextList(listQ3)) {
 		elemType * ans = nextList(listQ3);
 		fprintf(file3, "%s;%.2f\n", ans->name, ans->number);
