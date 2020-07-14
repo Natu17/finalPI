@@ -9,7 +9,7 @@
 #define BLOQUE 5
 #define MAX_LENGHT 1000
 
-
+//Asigna valores a una nueva estructura y la almacena
 void loadNeighbourhood(neighbourhoodADT neighbourhood, const char* nameNeighbourhood, const char* population) { 
 	neighbourhoodType newType;
 	newType.name = malloc((strlen(nameNeighbourhood) + 1) * sizeof(char));
@@ -19,7 +19,7 @@ void loadNeighbourhood(neighbourhoodADT neighbourhood, const char* nameNeighbour
 	free(newType.name);
 } 
 
-
+//Recorre el archivo csv de barrios y separa cada file en dos strings: uno para el nombre del barrio y otro para sus habitantes
 void readNeighbourhood(neighbourhoodADT neighbourhood, FILE* fileNeighbourhood) {
 	char c;
 	char *nameNeighbourhood = NULL;
@@ -67,7 +67,7 @@ void readNeighbourhood(neighbourhoodADT neighbourhood, FILE* fileNeighbourhood) 
 	free(population);
 }
 
-//Devuelve un puntero a int con los indices de las columnas que sirven
+//Devuelve un puntero a int con los indices de las columnas utiles
 int* readFirstRow(FILE* fileTrees) {
 	int countCol = 1;
 	char row[1000];
@@ -93,11 +93,13 @@ int* readFirstRow(FILE* fileTrees) {
     return index;
 }	
 
+//Almacena los valores proporcionados por readTrees()
 void loadTrees(treeADT tree, neighbourhoodADT neighbourhood, char* nameNeighbourhood, char* nameSpecies, char* diameter) {
 	addTree(tree, nameSpecies, atof(diameter));                 
 	addOneTree(neighbourhood, nameNeighbourhood);
 }
 
+//Recorre el archivo csv arboles, separando en strings los valores de las columnas utiles, proveidas por readFirstRow()
 void readTrees(treeADT tree, neighbourhoodADT neighbourhood, FILE* fileTrees) {
 	char c;
 	char *nameNeighbourhood = NULL;
@@ -139,7 +141,7 @@ void readTrees(treeADT tree, neighbourhoodADT neighbourhood, FILE* fileTrees) {
 		else if (count == index[2]) {
 			while (c != ';' && c != '\n') {
 				if (countString % BLOQUE == 0) {
-					diameter = realloc(diameter, ((countString + 1) + BLOQUE) * sizeof(char));
+					diameter = realloc(diameter, (countString + 1 + BLOQUE) * sizeof(char));
 				}
 				diameter[countString++] = c;
 				c = fgetc(fileTrees);
@@ -163,19 +165,29 @@ void readTrees(treeADT tree, neighbourhoodADT neighbourhood, FILE* fileTrees) {
 
 int main(int argc, char const *argv[])
 {
+
+	if (argc != 3) {
+		perror("Incorrect number of arguments\n");
+		return 1;
+	}
+
 	FILE *fileNeighbourhood = fopen(argv[2], "r");
 	if (fileNeighbourhood == NULL) {
 		perror("Error: Can't open file");	
-		return (-1);
+		return 2;
 	}
+
 	neighbourhoodADT neighbourhood = newNeighbourhoods();
 	readNeighbourhood(neighbourhood, fileNeighbourhood);
 	fclose(fileNeighbourhood);
+
+
 	FILE *fileTrees = fopen(argv[1], "r");
 	if (fileTrees == NULL) {
 		perror("Error: Can't open file");
-		return (-1);
+		return 2;
 	}
+
 	treeADT tree = newTree();
 	readTrees(tree, neighbourhood, fileTrees);
 
