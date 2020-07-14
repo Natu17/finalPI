@@ -30,7 +30,7 @@ treeADT newTree() {
 static PNode addTreeRec(PNode first, char * name, float diameter) {
 	int c;
 	errno = 0;
-	if(first == NULL || (c = strcmp(name, first->tree.name)) < 0){
+	if(first == NULL || (c = strcmp(name, first->tree.name)) < 0){ //no existe el arbol que se paso, entonces crea un nodo para guardarlo
 		PNode aux = malloc(sizeof(node));
 		if(errno == ENOMEM) { 
 			perror("Not enough memory");
@@ -47,7 +47,7 @@ static PNode addTreeRec(PNode first, char * name, float diameter) {
 		aux->tail = first;
 		return aux;
 	}
-	if(c == 0) {
+	if(c == 0) { //ya existe dicho arbol, enonces recalcula el primedio del diametro
 		first->tree.diameter = ((first->tree.diameter * first->count) + diameter) / (first->count + 1);
 		first->count++;
 		return first;
