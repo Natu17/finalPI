@@ -13,8 +13,9 @@ typedef struct treeType {
 //Devuelve nuevo arbol
 treeADT newTree();
 
-//Agrega si no esta, si ya esta recalcula el promedio
+//Agrega si no esta, si esta recalcula el promedio
 void addTree(treeADT tree, char* name, float diameter);
+
 
 void toBeginTree(treeADT tree);
 
