@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include "neighbourhood.h"
 #define BLOQUE  5
-#define MAX_LENGHT 25
+#define MAX_LENGHT 60
 
 typedef struct neighbourhoodCDT {
 	neighbourhoodType* neighbourhoods;
@@ -14,7 +14,6 @@ typedef struct neighbourhoodCDT {
 } neighbourhoodCDT;
 
 
-//crea un nuevo neighbourhoooADT
 neighbourhoodADT newNeighbourhoods(){
 	errno=0;
 	neighbourhoodADT newNeighbourhoodADT = calloc(1, sizeof(neighbourhoodCDT));
@@ -25,8 +24,9 @@ neighbourhoodADT newNeighbourhoods(){
 	return newNeighbourhoodADT;
 }
 
-
+//algoritmo para insericion de barrios
 void insertNeighbourhood(neighbourhoodType* neighbourhoods, neighbourhoodType neighbourhood, int dim){
+	errno = 0;
 	for(int i = 0; i < dim; i++){
 		int c = strcmp(neighbourhoods[i].name,neighbourhood.name);
 		if(c > 0){
@@ -36,6 +36,7 @@ void insertNeighbourhood(neighbourhoodType* neighbourhoods, neighbourhoodType ne
 		}
 		if(c == 0){
 			perror("ERROR two neighbourhoods with the same name");
+			errno = EPERM;  //no se permiten dos barrios con el mismo nombre (Operation not permitted)
 			return;
 		}
 	}
@@ -43,14 +44,13 @@ void insertNeighbourhood(neighbourhoodType* neighbourhoods, neighbourhoodType ne
 
 }
 
-//Agrega nombres de barrios
 void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType neighbourhood){
 	errno = 0;
 	if(neighbourhoodsData->dim % BLOQUE == 0){
 		neighbourhoodsData->neighbourhoods = realloc(neighbourhoodsData->neighbourhoods, (neighbourhoodsData->dim + BLOQUE)*sizeof(neighbourhoodType));
 		if(errno == ENOMEM){
 			perror("Not enough memory");
-			return;
+			errno = -1;
 		}
 	}
 
@@ -67,6 +67,7 @@ void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType nei
 	}
 	if(aux->name == NULL){
 		perror("Invalid name");
+		errno = EINVAL;  //el NULL es un argumento invalido (Invalid argument)
 		return;
 
 	}
@@ -78,6 +79,8 @@ void addNeighbourhood(neighbourhoodADT neighbourhoodsData, neighbourhoodType nei
 	}else{
 		insertNeighbourhood(neighbourhoodsData->neighbourhoods, neighbourhood,neighbourhoodsData->dim);
 	}
+	if(errno != 0)
+		return;
 	neighbourhoodsData->dim++;
 	
 }
@@ -101,11 +104,11 @@ int recursiveSearchAddTree(neighbourhoodType * neighbourhoods, int dim, char * n
 	return recursiveSearchAddTree(neighbourhoods + dim/2+1, dim-dim/2-1, name);
 }
 
-//Agrega un arbol en el barrio que corresponde
 void addOneTree(neighbourhoodADT neighbourhoodsData, char* name){
 	int ans = recursiveSearchAddTree(neighbourhoodsData-> neighbourhoods, neighbourhoodsData->dim, name);
 	if(ans == -1){
 		perror("no such neighbourhood");
+		errno = EPERM;  //no se permite buscar un barrio que no existe (Operation not permitted)
 	}
 }
 
@@ -119,7 +122,8 @@ int hasNext(neighbourhoodADT neighbourhoodsData){
 neighbourhoodType * next(neighbourhoodADT neighbourhoodsData){
 	if(!hasNext(neighbourhoodsData)){
 		perror("The element not exist");
-			return NULL;
+		errno = EPERM;  //no se permite hacer next a algo que no existe (Operation not permitted)
+		return NULL;
 	}
 	errno = 0;
 
@@ -142,7 +146,6 @@ neighbourhoodType * next(neighbourhoodADT neighbourhoodsData){
 
 
 void freeNeighbourhood(neighbourhoodADT neighbourhoodsData){
-	//neighbourhoodsData->neighbourhoods = realloc(neighbourhoodsData->neighbourhoods, (neighbourhoodsData->dim)*sizeof(neighbourhoodType));
 	for(int i=0;i<neighbourhoodsData->dim;i++){
 		free(neighbourhoodsData->neighbourhoods[i].name);
 	}

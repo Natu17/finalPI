@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "treeADT.h"
+#define MAX_LENGHT 100
 
 typedef struct node {
 	size_t count;
@@ -36,7 +37,7 @@ static PNode addTreeRec(PNode first, char * name, float diameter) {
 			perror("Not enough memory");
 			return first;
 		}
-		aux->tree.name = malloc(strlen(name) + 1);
+		aux->tree.name = malloc(MAX_LENGHT);
 		if(errno == ENOMEM) {
 			perror("Not enough memory");
 			return first;

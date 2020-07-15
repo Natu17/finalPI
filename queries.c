@@ -117,14 +117,22 @@ void freeList(PList list) {
 void query1and2(neighbourhoodADT neighbourhood){
 	PList listQ1 = newlist();
 	PList listQ2 = newlist();
+	if(errno != 0)
+		return;
 	FILE * file1 = fopen ("./query1.csv", "w+");
 	FILE * file2 = fopen ("./query2.csv", "w+");
 	toBegin(neighbourhood);
 	while(hasNext(neighbourhood)) {
 		neighbourhoodType * aux = next(neighbourhood);
+		if(errno != 0)
+			return;
 		add(listQ1, aux->name, aux->treeCount);
+		if(errno != 0)
+			return;
 		float value =(float) aux->treeCount/aux->population;
 		add(listQ2, aux->name, ((truncf(100 * value))) / 100.0);
+		if(errno != 0)
+			return;
 		free(aux->name);
 		free(aux);	
 	}
@@ -132,6 +140,8 @@ void query1and2(neighbourhoodADT neighbourhood){
 	fprintf(file1, "%s;%s\n","BARRIO", "ARBOLES");
 	while(hasNextList(listQ1)) {
 		elemType * elem = nextList(listQ1);
+		if(errno != 0)
+			return;
 		fprintf(file1, "%s;%0.f\n", elem->name, elem->number);
 		free(elem->name);
 		free(elem);	
@@ -141,8 +151,9 @@ void query1and2(neighbourhoodADT neighbourhood){
 	fprintf(file2, "%s;%s\n","BARRIO", "ARBOLES_POR_HABITANTE");
 	while(hasNextList(listQ2)) {
 		elemType * elem = nextList(listQ2);
+		if(errno != 0)
+			return;
 		fprintf(file2, "%s;%.2f\n", elem->name, elem->number);
-		// fprintf(file2, "%s;%.2f\n", elem->name, ((int)(100 * elem->number)) / 100.0);
 		free(elem->name);
 		free(elem);	
 	}
@@ -153,11 +164,17 @@ void query1and2(neighbourhoodADT neighbourhood){
 
 void query3(treeADT tree){
 	PList listQ3 = newlist();
+	if(errno != 0)
+		return;
 	FILE * file3 = fopen ("./query3.csv", "w+");
 	toBeginTree(tree);
 	while(hasNextTree(tree)) {
 		treeType * treeAux = nextTree(tree);
-		add(listQ3, treeAux->name, ((truncf(100 * treeAux->diameter))) / 100.0);	
+		if(errno != 0)
+			return;
+		add(listQ3, treeAux->name, ((truncf(100 * treeAux->diameter))) / 100.0);
+		if(errno != 0)
+			return;	
 		free(treeAux->name);
 		free(treeAux);
 	}
@@ -165,6 +182,8 @@ void query3(treeADT tree){
 	fprintf(file3, "%s;%s\n","NOMBRE_CIENTIFICO", "PROMEDIO_DIAMETRO");
 	while(hasNextList(listQ3)) {
 		elemType * ans = nextList(listQ3);
+		if(errno != 0)
+			return;
 		fprintf(file3, "%s;%.2f\n", ans->name, ans->number);
 		free(ans->name);
 		free(ans);
